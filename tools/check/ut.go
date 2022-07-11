@@ -25,6 +25,7 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"path/filepath"
 	"regexp"
 	"runtime"
 	"sort"
@@ -350,7 +351,7 @@ func cmdRun(args ...string) bool {
 }
 
 func parseCaseListFromFile(fileName string) (map[string]struct{}, error) {
-	f, err := os.Open(fileName)
+	f, err := os.Open(filepath.Clean(fileName))
 	if err != nil {
 		return nil, withTrace(err)
 	}
