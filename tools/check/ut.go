@@ -20,6 +20,7 @@ import (
 	"encoding/xml"
 	"fmt"
 	"io"
+	"log"
 	"math/rand"
 	"os"
 	"os/exec"
@@ -97,7 +98,7 @@ var workDir string
 func cmdList(args ...string) bool {
 	pkgs, err := listPackages()
 	if err != nil {
-		fmt.Println("list package error", err)
+		log.Println("list package error", err)
 		return false
 	}
 
@@ -120,12 +121,12 @@ func cmdList(args ...string) bool {
 
 		err := buildTestBinary(pkg)
 		if err != nil {
-			fmt.Println("build package error", pkg, err)
+			log.Println("build package error", pkg, err)
 			return false
 		}
 		exist, err := testBinaryExist(pkg)
 		if err != nil {
-			fmt.Println("check test binary existance error", err)
+			log.Println("check test binary existance error", err)
 			return false
 		}
 		if !exist {
@@ -135,7 +136,7 @@ func cmdList(args ...string) bool {
 
 		res, err := listTestCases(pkg, nil)
 		if err != nil {
-			fmt.Println("list test cases for package error", err)
+			log.Println("list test cases for package error", err)
 			return false
 		}
 
@@ -157,7 +158,7 @@ func cmdList(args ...string) bool {
 func cmdBuild(args ...string) bool {
 	pkgs, err := listPackages()
 	if err != nil {
-		fmt.Println("list package error", err)
+		log.Println("list package error", err)
 		return false
 	}
 
@@ -165,7 +166,7 @@ func cmdBuild(args ...string) bool {
 	if len(args) == 0 {
 		err := buildTestBinaryMulti(pkgs)
 		if err != nil {
-			fmt.Println("build package error", pkgs, err)
+			log.Println("build package error", pkgs, err)
 			return false
 		}
 		return true
@@ -176,7 +177,7 @@ func cmdBuild(args ...string) bool {
 		pkg := args[0]
 		err := buildTestBinary(pkg)
 		if err != nil {
-			fmt.Println("build package error", pkg, err)
+			log.Println("build package error", pkg, err)
 			return false
 		}
 	}
@@ -196,14 +197,14 @@ func cmdRun(args ...string) bool {
 	if len(args) == 0 {
 		err := buildTestBinaryMulti(pkgs)
 		if err != nil {
-			fmt.Println("build package error", pkgs, err)
+			log.Println("build package error", pkgs, err)
 			return false
 		}
 
 		for _, pkg := range pkgs {
 			exist, err := testBinaryExist(pkg)
 			if err != nil {
-				fmt.Println("check test binary existance error", err)
+				log.Println("check test binary existance error", err)
 				return false
 			}
 			if !exist {
@@ -213,7 +214,7 @@ func cmdRun(args ...string) bool {
 
 			tasks, err = listTestCases(pkg, tasks)
 			if err != nil {
-				fmt.Println("list test cases error", err)
+				log.Println("list test cases error", err)
 				return false
 			}
 		}
@@ -224,12 +225,12 @@ func cmdRun(args ...string) bool {
 		pkg := args[0]
 		err := buildTestBinary(pkg)
 		if err != nil {
-			fmt.Println("build package error", pkg, err)
+			log.Println("build package error", pkg, err)
 			return false
 		}
 		exist, err := testBinaryExist(pkg)
 		if err != nil {
-			fmt.Println("check test binary existance error", err)
+			log.Println("check test binary existance error", err)
 			return false
 		}
 
@@ -239,7 +240,7 @@ func cmdRun(args ...string) bool {
 		}
 		tasks, err = listTestCases(pkg, tasks)
 		if err != nil {
-			fmt.Println("list test cases error", err)
+			log.Println("list test cases error", err)
 			return false
 		}
 	}
@@ -249,12 +250,12 @@ func cmdRun(args ...string) bool {
 		pkg := args[0]
 		err := buildTestBinary(pkg)
 		if err != nil {
-			fmt.Println("build package error", pkg, err)
+			log.Println("build package error", pkg, err)
 			return false
 		}
 		exist, err := testBinaryExist(pkg)
 		if err != nil {
-			fmt.Println("check test binary existance error", err)
+			log.Println("check test binary existance error", err)
 			return false
 		}
 		if !exist {
@@ -264,12 +265,12 @@ func cmdRun(args ...string) bool {
 
 		tasks, err = listTestCases(pkg, tasks)
 		if err != nil {
-			fmt.Println("list test cases error", err)
+			log.Println("list test cases error", err)
 			return false
 		}
 		tasks, err = filterTestCases(tasks, args[1])
 		if err != nil {
-			fmt.Println("filter test cases error", err)
+			log.Println("filter test cases error", err)
 			return false
 		}
 	}
@@ -277,7 +278,7 @@ func cmdRun(args ...string) bool {
 	if except != "" {
 		list, err := parseCaseListFromFile(except)
 		if err != nil {
-			fmt.Println("parse --except file error", err)
+			log.Println("parse --except file error", err)
 			return false
 		}
 		tmp := tasks[:0]
@@ -292,7 +293,7 @@ func cmdRun(args ...string) bool {
 	if only != "" {
 		list, err := parseCaseListFromFile(only)
 		if err != nil {
-			fmt.Println("parse --only file error", err)
+			log.Println("parse --only file error", err)
 			return false
 		}
 		tmp := tasks[:0]
@@ -621,7 +622,7 @@ func (b blocksByStart) Less(i, j int) bool {
 func listTestCases(pkg string, tasks []task) ([]task, error) {
 	newCases, err := listNewTestCases(pkg)
 	if err != nil {
-		fmt.Println("list test case error", pkg, err)
+		log.Println("list test case error", pkg, err)
 		return nil, withTrace(err)
 	}
 	for _, c := range newCases {
